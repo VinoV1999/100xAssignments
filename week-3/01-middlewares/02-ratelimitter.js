@@ -16,6 +16,23 @@ setInterval(() => {
     numberOfRequestsForUser = {};
 }, 1000)
 
+app.use((req,res,next)=>{
+  const userID = req.headers['user-id'];
+  if(numberOfRequestsForUser.hasOwnProperty(userID)){
+    const noOfReq = numberOfRequestsForUser[userID];
+    if(noOfReq > 5){
+      res.status(404).json({msg:'Limit exit'});
+      return;
+    }
+    numberOfRequestsForUser[userID] = noOfReq + 1;
+    next();
+
+  }else{
+    numberOfRequestsForUser[userID] = 1;
+    next();
+  }
+});
+
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });
 });
